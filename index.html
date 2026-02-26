@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI | Intelligent Resume Analyzer</title>
+    <meta name="description" content="An advanced AI-powered resume analyzer to optimize your career path.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <span class="logo-icon">✨</span>
+            <span class="logo-text">ResumeAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#analyze" class="btn-primary">Get Started</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1 class="fade-in">Supercharge Your <span class="gradient-text">Career Search</span></h1>
+            <p class="hero-subtitle fade-in-delayed">Upload your resume and get instant AI-powered feedback on your
+                skills, experience, and ATS compatibility.</p>
+        </section>
+
+        <section id="onboarding" class="analyzer-container fade-in-up">
+            <div class="upload-card">
+                <div class="onboarding-form">
+                    <h2 class="gradient-text" style="margin-bottom: 0.5rem;">Profile Setup</h2>
+                    <p style="margin-bottom: 2.5rem; color: var(--text-dim);">Help us personalize your resume analysis.
+                    </p>
+
+                    <div class="onboarding-grid">
+                        <div class="input-group">
+                            <label>Your Age</label>
+                            <input type="number" id="user-age" placeholder="e.g. 24">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Completed Degree</label>
+                            <input type="text" id="user-degree" placeholder="e.g. B.Tech CS">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Years of Experience</label>
+                            <input type="number" id="user-experience" placeholder="e.g. 2">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Target Job Role</label>
+                            <input type="text" id="user-role" placeholder="e.g. Developer">
+                        </div>
+                    </div>
+
+                    <button id="start-analysis-btn" class="btn-primary large-btn"
+                        style="width: 100%; margin-top: 1rem;">Continue to Upload</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="analyze" class="analyzer-container hidden">
+            <div class="upload-card fade-in-up">
+                <div class="input-split">
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <div class="icon-upload">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <h3>Upload Resume</h3>
+                            <p>PDF (Max 5MB)</p>
+                            <button class="btn-secondary" onclick="document.getElementById('file-input').click()">Browse
+                                Files</button>
+                            <input type="file" id="file-input" hidden accept=".pdf">
+                        </div>
+                    </div>
+
+                    <div class="jd-input-container">
+                        <h3>Job Description</h3>
+                        <p>Paste the JD here for comparison</p>
+                        <textarea id="jd-text"
+                            placeholder="Paste the job description or requirements here..."></textarea>
+                    </div>
+                </div>
+
+                <div class="action-btn-container">
+                    <button id="analyze-btn" class="btn-primary large-btn">Analyze Match</button>
+                </div>
+
+                <div id="processing" class="processing-overlay hidden">
+                    <div class="loader"></div>
+                    <p>Analyzing your potential...</p>
+                </div>
+            </div>
+
+            <div id="results" class="results-container hidden">
+                <div class="results-grid">
+                    <div class="result-card score-card">
+                        <h4>Overall Score</h4>
+                        <div class="score-circle">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" id="score-path" stroke-dasharray="0, 100"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage" id="score-text">0%</text>
+                            </svg>
+                        </div>
+                        <p id="score-feedback">Your resume looks great! Just a few minor tweaks needed.</p>
+                    </div>
+
+                    <div class="result-card keyskills-card">
+                        <h4>Skills Analysis</h4>
+                        <div class="skills-comparison">
+                            <div class="skill-group">
+                                <h5>Matching Skills</h5>
+                                <div id="keywords-list" class="tag-cloud"></div>
+                            </div>
+                            <div class="skill-group">
+                                <h5>Missing Skills</h5>
+                                <div id="missing-skills-list" class="tag-cloud"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card suggestions-card">
+                        <h4>Recommended to Add</h4>
+                        <div id="suggestions-list" class="tag-cloud"></div>
+                    </div>
+
+                    <div class="result-card insights-card">
+                        <h4>Improvement Summary</h4>
+                        <div id="improvement-summary" class="summary-text"></div>
+                        <ul id="insights-list" class="insights-list">
+                            <!-- Insights will be injected here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-outline" onclick="resetAnalyzer()">Analyze Another</button>
+                    <button class="btn-primary" id="download-report">Download Full Report</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 ResumeAI. Built for champions.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
